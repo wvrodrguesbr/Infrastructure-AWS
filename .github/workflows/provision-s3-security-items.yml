@@ -39,4 +39,4 @@ jobs:
           NUMBER: ${{ github.event.issue.number }} # Changed '$' to '${{ }}' for accessing variables
           REPO: ${{ github.repository }}
           BODY: >
-            The S3 bucket was created successfully!! # Adjusted indentation and content
+            The S3 bucket was created successfully!! 
