@@ -28,9 +28,7 @@ jobs:
 
       - name: Run Terraform
         run: |
-          cd terraform
-          cd Projects
-          cd github
+          cd TerraformAWS
           terraform init
           terraform apply -auto-approve -var="bucket_name=${{ env.BUCKET_NAME }}" # Corrected 'auto approve' to 'auto-approve'
 
