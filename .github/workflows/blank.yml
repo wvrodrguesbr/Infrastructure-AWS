@@ -1,0 +1,42 @@
+name: Create S3 Non-security Items
+
+on:
+  issues:
+    types: # 'types' instead of 'type'
+      - opened
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2 # 'checkout' instead of 'chekout'
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # Removed unnecessary space after '$'
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Removed unnecessary space after '$'
+          aws-region: us-east-1
+
+      - name: Extract Bucket Name from Issue
+        run: |
+          export BUCKET_NAME=$(echo "${{ github.event.issue.title }}")
+          echo "Bucket Name: $BUCKET_NAME"
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV # Removed unnecessary space after '='
+
+      - name: Run Terraform
+        run: |
+          cd TerraformAWS
+          terraform init
+          terraform apply -auto-approve -var="bucket_name=${{ env.BUCKET_NAME }}" # Corrected 'auto approve' to 'auto-approve'
+
+      - name: Add comment
+        run: gh issue comment "${{ env.NUMBER }}" --repo "${{ env.REPO }}" --body "${{ env.BODY }}" # Changed '$' to '${{ }}' for environment variables
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NUMBER: ${{ github.event.issue.number }} # Changed '$' to '${{ }}' for accessing variables
+          REPO: ${{ github.repository }}
+          BODY: >
+            The S3 bucket was created successfully!! 
